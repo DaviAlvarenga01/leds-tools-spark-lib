@@ -1,22 +1,20 @@
 import fs from "fs";
 import { expandToString } from "../../../../util/template-string.js";
+import { createPath } from "../../../../util/generator-utils.js";
 import path from "path";
 import SEON from "seon-lib-implementation";
 
 export function generate(project_abstraction: SEON.ProjectAbstraction, target_folder: string) : void {
-    // Cria pasta de docs
-    const docsFolder = path.join(target_folder, 'docs');
-    fs.mkdirSync(docsFolder, { recursive: true });
+    // Gera os componentes com documentação no diretório correto
+    const components_folder = createPath(target_folder, "src", "components");
     
-    // Gera os componentes
+    fs.mkdirSync(components_folder, { recursive: true });
+    
     fs.writeFileSync(path.join(target_folder, 'DataTable.vue'), generateDataTable());
     fs.writeFileSync(path.join(target_folder, 'Card.vue'), generateCard());
     fs.writeFileSync(path.join(target_folder, 'GenericTextInput.vue'), generateGenericTextInpput());
     fs.writeFileSync(path.join(target_folder, 'PButton.vue'), generatePButton());
     fs.writeFileSync(path.join(target_folder, 'TextInput.vue'), generateNoGenericTextInpput());
-    
-    // Copia a documentação
-    fs.writeFileSync(path.join(docsFolder, 'README.md'), fs.readFileSync(path.join(__dirname, 'docs', 'README.md')));
     fs.writeFileSync(path.join(target_folder, 'README.md'), generateREADME());
 }
 
@@ -77,8 +75,20 @@ import { computed } from 'vue'
 
 function generatePButton(): string {
     return expandToString`
-<!-- P de 'pretty', para ser curto e n conflitar com button nativo-->
 <script setup lang="ts">
+/**
+ * Botão estilizado com diferentes variantes
+ * @description Um componente de botão que oferece diferentes estilos visuais
+ * 
+ * @prop {('default'|'error')} [variant='default'] - A variante visual do botão
+ * 
+ * @example
+ * <template>
+ *   <PButton variant="default" @click="handleClick">
+ *     Clique aqui
+ *   </PButton>
+ * </template>
+ */
 import { computed } from 'vue';
 
 const props = withDefaults(defineProps<{
@@ -111,6 +121,24 @@ const className = computed(() => {
 function generateNoGenericTextInpput(): string { 
     return expandToString`
 <script lang="ts">
+/**
+ * Campo de entrada de texto com validação
+ * @description Componente de input que incorpora validação e feedback visual
+ *
+ * @prop {('text'|'password')} [type='text'] - Tipo do campo de entrada
+ * @prop {string} [placeholder] - Texto de placeholder do input
+ * @prop {ValidationResultFunction[]} [rules] - Array de funções de validação
+ *
+ * @emits {(valid: boolean) => void} validationUpdate - Emitido quando o estado de validação muda
+ * @emits {void} keyupEnter - Emitido quando a tecla Enter é pressionada
+ *
+ * @example
+ * <template>
+ *   <TextInput v-model="value" :rules="[required, minLength(3)]" @validation-update="handleValidation">
+ *     Nome do usuário
+ *   </TextInput>
+ * </template>
+ */
 import { computed, watch } from 'vue'
 import type { GenericTextInputProps } from './GenericTextInput.vue'
 import type { ValidationResult, ValidationResultFunction } from '@/utils/regras'

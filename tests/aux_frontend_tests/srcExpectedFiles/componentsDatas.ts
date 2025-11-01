@@ -17,7 +17,6 @@ const textInput: string = path.join(srcComponentsPath, 'TextInput.vue');
 
 export const srcComponentsFiles: { [key: string]:   string  } = {};
 
-
 srcComponentsFiles[iconNav] = expandToString`
 <script lang="ts" setup>
 defineProps<{
