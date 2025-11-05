@@ -1,0 +1,458 @@
+# Django Python CI/CD Workflow
+# 
+# This workflow provides continuous integration and deployment for Django projects
+# Generated based on the Spark Lib Django settings generator (setting-generator.ts)
+#
+# Features:
+# - Code linting with flake8
+# - Unit testing with pytest
+# - Code quality analysis with SonarCloud
+# - Docker image building and publishing
+# - Automated deployment to development and production environments
+# - Semantic versioning with commitizen
+
+name: Django CI/CD
+
+on:
+  push:
+    branches: [ main, dev, develop ]
+  pull_request:
+    branches: [ main, dev ]
+
+env:
+  PYTHON_VERSION: '3.10'
+  DOCKER_REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}
+
+jobs:
+  # Job 1: Lint and Test
+  # Based on lint-test stage from setting-generator.ts (lines 793-812)
+  lint-test:
+    name: Lint and Test
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      
+      - name: Set up Python ${{ env.PYTHON_VERSION }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: 'pip'
+      
+      - name: Cache pip dependencies
+        uses: actions/cache@v3
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-
+      
+      - name: Create virtual environment
+        run: |
+          python -V
+          python -m venv venv
+      
+      - name: Install dependencies
+        run: |
+          source venv/bin/activate
+          python -m pip install --upgrade pip
+          pip install flake8 pytest pytest-django pytest-cov
+          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+      
+      - name: Lint with flake8
+        run: |
+          source venv/bin/activate
+          echo "====== Running lint ======"
+          # Stop the build if there are Python syntax errors or undefined names
+          flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
+          # Exit-zero treats all errors as warnings
+          flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
+      
+      - name: Run tests with pytest
+        env:
+          DJANGO_SETTINGS_MODULE: core.settings.test
+          SECRET_KEY: test-secret-key-for-ci
+          USE_SQLITE: true
+        run: |
+          source venv/bin/activate
+          echo "====== Running tests ======"
+          pytest --cov=. --cov-report=xml --cov-report=html
+      
+      - name: Upload coverage reports
+        uses: codecov/codecov-action@v3
+        with:
+          file: ./coverage.xml
+          flags: unittests
+          name: codecov-umbrella
+
+  # Job 2: SonarCloud Analysis
+  # Based on sonarcloud-check stage from setting-generator.ts (lines 814-840)
+  sonarcloud:
+    name: SonarCloud Code Quality
+    runs-on: ubuntu-latest
+    needs: lint-test
+    if: github.event_name == 'pull_request' || github.ref == 'refs/heads/main' || github.ref == 'refs/heads/dev'
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Shallow clones should be disabled for better analysis
+      
+      - name: Cache SonarCloud packages
+        uses: actions/cache@v3
+        with:
+          path: ~/.sonar/cache
+          key: ${{ runner.os }}-sonar
+          restore-keys: ${{ runner.os }}-sonar
+      
+      - name: SonarCloud Scan
+        uses: SonarSource/sonarcloud-github-action@master
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+
+  # Job 3: Semantic Version Bump
+  # Based on bump stage from setting-generator.ts (lines 842-870)
+  bump-version:
+    name: Bump Semantic Version
+    runs-on: ubuntu-latest
+    needs: [lint-test, sonarcloud]
+    if: github.ref == 'refs/heads/main'
+    
+    permissions:
+      contents: write
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+      
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+      
+      - name: Install commitizen
+        run: |
+          pip install -U commitizen
+      
+      - name: Configure Git
+        run: |
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git config --global user.name "github-actions[bot]"
+      
+      - name: Bump version
+        id: bump
+        run: |
+          echo "====== Bumping version ======"
+          cz bump --yes || echo "No version bump needed"
+          if [ -f VERSION ]; then
+            TAG=$(head -n 1 VERSION)
+            echo "tag=$TAG" >> $GITHUB_OUTPUT
+            echo "$TAG" > version
+          else
+            echo "tag=0.0.1" >> $GITHUB_OUTPUT
+            echo "0.0.1" > version
+          fi
+      
+      - name: Push changes
+        run: |
+          git push origin main || echo "No changes to push"
+          git push --tags || echo "No tags to push"
+      
+      - name: Upload version artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: version
+          path: version
+      
+      - name: Create GitHub Release
+        if: steps.bump.outputs.tag != ''
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ steps.bump.outputs.tag }}
+          release_name: Release ${{ steps.bump.outputs.tag }}
+          draft: false
+          prerelease: false
+
+  # Job 4: Build Docker Image (Development)
+  # Based on build_dev stage from setting-generator.ts (lines 872-911)
+  build-dev:
+    name: Build Development Image
+    runs-on: ubuntu-latest
+    needs: lint-test
+    if: github.ref == 'refs/heads/dev' || github.ref == 'refs/heads/develop'
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+      
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.DOCKER_REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      
+      - name: Extract metadata for Docker
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.DOCKER_REGISTRY }}/${{ env.IMAGE_NAME }}
+          tags: |
+            type=ref,event=branch
+            type=raw,value=dev
+      
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=registry,ref=${{ env.DOCKER_REGISTRY }}/${{ env.IMAGE_NAME }}:buildcache
+          cache-to: type=registry,ref=${{ env.DOCKER_REGISTRY }}/${{ env.IMAGE_NAME }}:buildcache,mode=max
+          build-args: |
+            TAG=dev
+
+  # Job 5: Deploy to Development
+  # Based on deploy_dev stage from setting-generator.ts (lines 913-950)
+  deploy-dev:
+    name: Deploy to Development Environment
+    runs-on: ubuntu-latest
+    needs: build-dev
+    if: github.ref == 'refs/heads/dev' || github.ref == 'refs/heads/develop'
+    environment:
+      name: development
+      url: ${{ secrets.DEV_URL }}
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Deploy to Development Server
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.DEV_HOST }}
+          username: ${{ secrets.DEV_USERNAME }}
+          key: ${{ secrets.SSH_PRIVATE_KEY_DEV }}
+          script: |
+            cd ~/app
+            echo "Logging into GitHub Container Registry..."
+            echo "${{ secrets.GITHUB_TOKEN }}" | docker login ${{ env.DOCKER_REGISTRY }} -u ${{ github.actor }} --password-stdin
+            
+            echo "Pulling development image..."
+            docker pull ${{ env.DOCKER_REGISTRY }}/${{ env.IMAGE_NAME }}:dev
+            
+            export IMAGE_REGISTRY_NAME=${{ env.DOCKER_REGISTRY }}/${{ env.IMAGE_NAME }}
+            export TAG=dev
+            
+            echo "Stopping existing containers..."
+            docker-compose -f homol.yml stop || true
+            
+            echo "Pruning unused containers..."
+            docker container prune -f
+            
+            echo "Starting new containers..."
+            docker-compose -f homol.yml up -d
+            
+            echo "Deployment to development completed!"
+
+  # Job 6: Build Docker Image (Production)
+  # Based on build_prod stage from setting-generator.ts (lines 952-980)
+  build-prod:
+    name: Build Production Image
+    runs-on: ubuntu-latest
+    needs: [lint-test, sonarcloud, bump-version]
+    if: github.ref == 'refs/heads/main'
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Download version artifact
+        uses: actions/download-artifact@v3
+        with:
+          name: version
+      
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+      
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.DOCKER_REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      
+      - name: Get version
+        id: version
+        run: |
+          if [ -f version ]; then
+            TAG=$(cat version)
+            echo "tag=$TAG" >> $GITHUB_OUTPUT
+          else
+            TAG=latest
+            echo "tag=$TAG" >> $GITHUB_OUTPUT
+          fi
+          echo "Building production image with tag: $TAG"
+      
+      - name: Extract metadata for Docker
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.DOCKER_REGISTRY }}/${{ env.IMAGE_NAME }}
+          tags: |
+            type=ref,event=branch
+            type=semver,pattern={{version}},value=${{ steps.version.outputs.tag }}
+            type=semver,pattern={{major}}.{{minor}},value=${{ steps.version.outputs.tag }}
+            type=raw,value=${{ steps.version.outputs.tag }}
+            type=raw,value=latest
+      
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=registry,ref=${{ env.DOCKER_REGISTRY }}/${{ env.IMAGE_NAME }}:buildcache
+          cache-to: type=registry,ref=${{ env.DOCKER_REGISTRY }}/${{ env.IMAGE_NAME }}:buildcache,mode=max
+          build-args: |
+            TAG=${{ steps.version.outputs.tag }}
+      
+      - name: Upload version artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: version-prod
+          path: version
+
+  # Job 7: Deploy to Production
+  # Based on deploy_main stage from setting-generator.ts (lines 982-1010)
+  deploy-prod:
+    name: Deploy to Production Environment
+    runs-on: ubuntu-latest
+    needs: build-prod
+    if: github.ref == 'refs/heads/main'
+    environment:
+      name: production
+      url: ${{ secrets.PROD_URL }}
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Download version artifact
+        uses: actions/download-artifact@v3
+        with:
+          name: version-prod
+      
+      - name: Get version
+        id: version
+        run: |
+          if [ -f version ]; then
+            TAG=$(cat version)
+            echo "tag=$TAG" >> $GITHUB_OUTPUT
+          else
+            TAG=latest
+            echo "tag=$TAG" >> $GITHUB_OUTPUT
+          fi
+          echo "Deploying version: $TAG"
+      
+      - name: Deploy to Production Server
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.PROD_HOST }}
+          username: ${{ secrets.PROD_USERNAME }}
+          key: ${{ secrets.SSH_PRIVATE_KEY_PROD }}
+          script: |
+            cd ~/app
+            echo "Logging into GitHub Container Registry..."
+            echo "${{ secrets.GITHUB_TOKEN }}" | docker login ${{ env.DOCKER_REGISTRY }} -u ${{ github.actor }} --password-stdin
+            
+            echo "Pulling production image with tag ${{ steps.version.outputs.tag }}..."
+            docker pull ${{ env.DOCKER_REGISTRY }}/${{ env.IMAGE_NAME }}:${{ steps.version.outputs.tag }}
+            
+            export IMAGE_REGISTRY_NAME=${{ env.DOCKER_REGISTRY }}/${{ env.IMAGE_NAME }}
+            export TAG=${{ steps.version.outputs.tag }}
+            
+            echo "Stopping existing containers..."
+            docker-compose -f prod.yml stop || true
+            
+            echo "Pruning unused containers..."
+            docker container prune -f
+            
+            echo "Starting new containers..."
+            docker-compose -f prod.yml up -d
+            
+            echo "Production deployment completed!"
+
+  # Job 8: Notification
+  # Additional job for notifications (mentioned in stages)
+  notification:
+    name: Send Deployment Notifications
+    runs-on: ubuntu-latest
+    needs: [deploy-dev, deploy-prod]
+    if: always()
+    
+    steps:
+      - name: Check deployment status
+        id: status
+        run: |
+          if [ "${{ needs.deploy-dev.result }}" == "success" ] || [ "${{ needs.deploy-prod.result }}" == "success" ]; then
+            echo "status=success" >> $GITHUB_OUTPUT
+            echo "message=Deployment completed successfully!" >> $GITHUB_OUTPUT
+          elif [ "${{ needs.deploy-dev.result }}" == "failure" ] || [ "${{ needs.deploy-prod.result }}" == "failure" ]; then
+            echo "status=failure" >> $GITHUB_OUTPUT
+            echo "message=Deployment failed!" >> $GITHUB_OUTPUT
+          else
+            echo "status=skipped" >> $GITHUB_OUTPUT
+            echo "message=Deployment skipped" >> $GITHUB_OUTPUT
+          fi
+      
+      - name: Send Slack notification
+        if: secrets.SLACK_WEBHOOK_URL != '' && steps.status.outputs.status != 'skipped'
+        uses: 8398a7/action-slack@v3
+        with:
+          status: ${{ steps.status.outputs.status }}
+          text: |
+            ${{ steps.status.outputs.message }}
+            Repository: ${{ github.repository }}
+            Branch: ${{ github.ref_name }}
+            Commit: ${{ github.sha }}
+            Actor: ${{ github.actor }}
+          webhook_url: ${{ secrets.SLACK_WEBHOOK_URL }}
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+      
+      - name: Send email notification
+        if: steps.status.outputs.status == 'failure'
+        uses: dawidd6/action-send-mail@v3
+        with:
+          server_address: ${{ secrets.SMTP_SERVER }}
+          server_port: ${{ secrets.SMTP_PORT }}
+          username: ${{ secrets.SMTP_USERNAME }}
+          password: ${{ secrets.SMTP_PASSWORD }}
+          subject: "❌ Deployment Failed - ${{ github.repository }}"
+          body: |
+            Deployment Status: FAILED
+            Repository: ${{ github.repository }}
+            Branch: ${{ github.ref_name }}
+            Commit: ${{ github.sha }}
+            Actor: ${{ github.actor }}
+            
+            Please check the workflow logs for more details.
+          to: ${{ secrets.NOTIFICATION_EMAIL }}
+          from: GitHub Actions
