@@ -15,7 +15,7 @@
 
 import SEON from "seon-lib-implementation"
 import { ProjectGenerator } from "./ProjectGenerator.js"
-import { isAttribute, isLocalEntity, isModule, Model } from "./backend/models/model.js"
+import { isAttribute, isLocalEntity, isModule, Model } from "module-doc-lib"
 
 /**
  * Main generation function

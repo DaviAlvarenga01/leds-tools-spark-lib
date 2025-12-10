@@ -11,7 +11,11 @@ import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { useCookies } from '@vueuse/integrations/useCookies'
 
-
+/**
+ * @description AuthStore: Authentication Store This store manages user authentication state and session handling.
+ * @params {string} usuario - Current logged-in user.
+ * @returns Store with authentication state and methods.
+ */
 
 export const useAuthStore = defineStore('auth', () => {
   const router = useRouter()
@@ -31,6 +35,14 @@ export const useAuthStore = defineStore('auth', () => {
         maxAge:  600
       })
   }
+})
+
+/**
+ * @function Async login - Logs in a user and sets session token.
+ * @params {string} novoUsuario - Username for login.
+ * @params {string} senha - Password for login.
+ * @returns Redirects to home page after login.
+*/
 
   const login = async (novoUsuario: string, senha: string) => {
     // requisicao a api vai aqui
@@ -39,11 +51,23 @@ export const useAuthStore = defineStore('auth', () => {
     setSessionToken(true)
     return await router.push({ name: 'entidade1-home' })
   }
+
+/**
+ * @function Async logout - Logs out the user and clears session token.
+ * @params none
+ * @returns Redirects to login page after logout.
+
   const logout = async () => {
     usuario.value = ''
     setSessionToken(false)
     return await router.push({ name: 'login' })
   }
+
+/**
+ * @function estaLogado - Checks if a user is currently logged in.
+ * @returns {boolean} True if user is logged in, false otherwise.
+ */ 
+
   const estaLogado = () => {
     return getSessionToken()
   }
@@ -54,7 +78,7 @@ export const useAuthStore = defineStore('auth', () => {
     logout,
     estaLogado,
   }
-})`;
+})`; 
 
 srcStoresFiles[path.join(srcStoresPath, "ui.ts")] = expandToString
 `import { defineStore } from 'pinia'
@@ -80,6 +104,11 @@ const usePrivateState = defineStore('ui-private', () => {
   } as PrivateUIStore
 })
 
+/**
+ * @description UiStore: UI State Store This store manages global UI state such as alerts, sidebar visibility, and other UI-related state.
+ * @params {ComputedRef<Snackbar[]>} mensagensAlerta - Queue of alert messages.
+ * @returns {object} Store with UI state and methods.
+ */ 
 
 interface UIStore {
   mensagensAlerta: ComputedRef<Snackbar[]>
@@ -88,11 +117,24 @@ interface UIStore {
   fecharAlerta: (mensagensRestantes: Snackbar[]) => boolean
   carregando: Ref<boolean>
   mostrarBarraLateral: Ref<boolean>
+  
 }
+
+/** 
+ * @description useUiStore - Pinia store for managing UI state including alerts and sidebar visibility.
+ * @return {UIStore} Store with UI state and methods.
+ */
+
 export const useUiStore = defineStore('ui', () => {
   const privado = usePrivateState() as unknown as PrivateUIStore_
 
   const mensagensAlerta = computed(() => privado.mensagensAlerta)
+
+/**
+ * @description exibirAlertas - Displays multiple alert messages in the UI.
+ * @param {Snackbar[]} novasMensagens - Array of new alert messages to display.
+ * @returns {boolean} True if alerts were added successfully.
+ */
 
   const exibirAlertas = (
     novasMensagens: Snackbar[]
@@ -106,12 +148,22 @@ export const useUiStore = defineStore('ui', () => {
     return exibirAlertas([novaMsgAlerta])
   }
 
+  /**
+   * @description fecharAlerta - Closes alert messages and updates the alert queue.
+   * @param {Snackbar[]} mensagensRestantes - Remaining alert messages after closing.
+   * @returns {boolean} True if alerts were updated successfully.
+   */
+
   const fecharAlerta = (mensagensRestantes: Snackbar[]) => {
     privado.mensagensAlerta = mensagensRestantes
     return true
   }
 
   const carregando = ref(false)
+
+  /**
+   * @description mostrarBarraLateral - Reactive state for sidebar visibility.
+   */
 
   const mostrarBarraLateral = ref(true)
 

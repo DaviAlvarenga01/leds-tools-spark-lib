@@ -23,12 +23,15 @@ export function checkFileContent(fileTest: string, testString: string = "", isJs
         }
         else {
             if (fileGeneratedString !== testString) {
-                throw new Error(`The content of ${fileTest} is wrong`);
+                throw new Error(`The content of ${fileTest} is wrong. Expected length: ${testString.length}, Got: ${fileGeneratedString.length}`);
             }
         }
 
     }
     catch (err) {
+        if (err instanceof Error) {
+            throw err; // Re-throw the original error with its message
+        }
         throw new Error(`File not found or inacessible: ${fileTest}`);
     }
 }

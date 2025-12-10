@@ -1,7 +1,7 @@
 import { beforeAll, expect, test } from "vitest"
 import { translate as translate_generate } from "../src/generate.js"
 import SEON from "seon-lib-implementation"
-import { Attribute, Configuration, LocalEntity, Model, Module } from "../src/backend/models/model.js"
+import { Attribute, Configuration, LocalEntity, Model, Module } from "module-doc-lib"
 
 let configuration: Configuration = {
     $type: "Configuration",

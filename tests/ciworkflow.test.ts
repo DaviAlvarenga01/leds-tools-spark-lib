@@ -1,5 +1,5 @@
 import { beforeAll, expect, test } from "vitest"
-import { Attribute, Configuration, LocalEntity, Model, Module } from "../src/backend/models/model.js"
+import { Attribute, Configuration, LocalEntity, Model, Module } from "module-doc-lib"
 import {generate} from "../src/backend/generators/django.js"
 
 let configuration: Configuration = {

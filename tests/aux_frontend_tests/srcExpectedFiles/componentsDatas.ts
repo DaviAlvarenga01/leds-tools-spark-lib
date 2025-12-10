@@ -6,7 +6,6 @@ import { expandToString } from "../../../src/util/template-string";
 const navGroup: string = path.join(srcSidenavComponentsPath, 'NavGroup.vue');
 const navItem: string = path.join(srcSidenavComponentsPath, 'NavItem.vue');
 const navMenu: string = path.join(srcSidenavComponentsPath, 'NavMenu.vue');
-const iconNav: string = path.join(srcIconsComponentsPath, 'IconNav.vue');
 const card: string = path.join(srcComponentsPath, 'Card.vue');
 const dataTable: string = path.join(srcComponentsPath, 'DataTable.vue');
 const genericTextInput: string = path.join(srcComponentsPath, 'GenericTextInput.vue');
@@ -18,36 +17,20 @@ const textInput: string = path.join(srcComponentsPath, 'TextInput.vue');
 export const srcComponentsFiles: { [key: string]:   string  } = {};
 
 
-srcComponentsFiles[iconNav] = expandToString`
-<script lang="ts" setup>
-defineProps<{
-  open: boolean
-}>()
-</script>
-
-<template>
-  <div class="">
-    <svg
-      :class="open ? 'rotate-180' : ''"
-      class="w-3 h-3 transition-transform origin-center"
-      fill="none"
-      stroke="currentColor"
-      viewBox="0 0 20 10"
-    >
-      <path
-        stroke-linecap="round"
-        stroke-linejoin="round"
-        stroke-width="2"
-        d="M0,0 L10,10 L20,0"
-      />
-    </svg>
-  </div>
-</template>`;
-
 srcComponentsFiles[navGroup] = expandToString`
 <script lang="ts" setup>
 import { ref } from 'vue'
 import IconNav from '../icons/IconNav.vue';
+
+/**
+ * @description NavGroup: Navigation Group Component This component represents a collapsible group of navigation items within a sidebar or navigation menu. 
+ * @description It displays a label and can expand or collapse to show or hide its child navigation items. 
+ * @description The open state is managed internally, allowing users to toggle the visibility of the contained items.
+ * @component 
+ * @example <NavGroup label="Group Label"> ... </NavGroup>
+ * @prop {string} label - The label for the navigation group.
+ */
+
 
 defineProps<{
   label: string
@@ -80,6 +63,15 @@ srcComponentsFiles[navItem] = expandToString`
 defineProps<{
   label: string
 }>()
+
+/**
+ * @description NavItem Link Component This component represents a single navigation item within a sidebar or navigation menu.
+ * 
+ * @component 
+ * @example <NavItem :to="{ name: 'route-name' }" label="Item Label" />
+ * @prop {string} label - The label for the navigation item.
+ */ 
+
 </script>
 
 <template>
@@ -91,191 +83,22 @@ defineProps<{
   </router-link>
 </template>`;
 
-srcComponentsFiles[navMenu] = expandToString`
-<script lang="ts" setup>
-import NavGroup from './NavGroup.vue'
-import NavItem from './NavItem.vue'
-</script>
-
-<template>
-  <aside class="flex flex-col h-full px-4 py-6 text-white lg:px-2">
-    <section class="flex flex-col grow items-center w-full h-14 px-5 space-x-2 bg-gray-0 z-30 lg:static lg:flex-col lg:justify-start lg:px-0 lg:space-x-0 lg:space-y-2 lg:bg-transparent">
-      <!-- <NavItem to="/" label="Página inicial" /> -->
-
-<NavGroup label="Entidade1">
-  <NavItem :to="{ name: 'entidade1-home' }" label="Listar" />
-  <NavItem :to="{ name: 'entidade1-criar' }" label="Criar" />
-</NavGroup><NavGroup label="Entidade2">
-  <NavItem :to="{ name: 'entidade2-home' }" label="Listar" />
-  <NavItem :to="{ name: 'entidade2-criar' }" label="Criar" />
-</NavGroup>
-
-    </section>
-  </aside>
-</template>`;
-
 srcComponentsFiles[card] = expandToString`
 <template>
   <div class="p-3 border-2 rounded-md border-zinc-500 shadow-md">
     <slot />
   </div>
-</template>`;
+</template>
 
-srcComponentsFiles[dataTable] = expandToString`
 <script setup lang="ts">
-import { computed, reactive, ref } from 'vue'
+/**
+ * @description GenerateCard Simple Card Component This component represents a simple card layout with padding, border, rounded corners, and shadow.
+ * 
+ * @component 
+ * @example <Card></Card>Card Content</Card>
+ */ 
 
-interface DataTableHeader {
-  title: string; // titulo da coluna
-  value: string; // valor da coluna
-}
-
-type DataTableItem = Record<string, string | number>
-
-interface DataTableProps {
-  items: DataTableItem[]
-  headers?: DataTableHeader[]
-}
-
-const { items, headers } = defineProps<DataTableProps>()
-
-
-const processedHeaders = computed(() => {
-  if (headers) {
-    return headers
-  } else if (items.length > 0) {
-    return Object.keys(items[0]).map((key) => {
-      return { title: key, value: key }
-    })
-  }
-})
-
-/* pode ser exportado como v-model ou defineExpose. deixar sem exportar por enquanto */
-const selectedItems = reactive<Record<number, DataTableItem>>({})
-
-/* import { watch } from 'vue'
-watch(selectedItems, (newValue) => console.log(newValue)) */
-
-const updateSelected = (index: number, event: Event) => {
-  const checked = (event.target as HTMLInputElement | null)?.checked
-  if (checked) {
-    selectedItems[index] = items[index]
-  } else {
-    delete selectedItems[index]
-  }
-}
-
-const selectAll = ref(false)
-const toggleSelectAll = (event: Event) => {
-  selectAll.value = !!(event.target as HTMLInputElement | null)?.checked
-  if (selectAll.value) {
-    items.forEach((item, index) => {
-      selectedItems[index] = item
-    })
-  } else {
-    items.forEach((_, index) => {
-      delete selectedItems[index]
-    })
-  }
-}
-
-
-const emit = defineEmits<{
-  editar: [id: DataTableItem];
-  excluir: [ids: DataTableItem[]];
-}>()
-
-const editarDesabilitado = computed(() => {
-  return Object.keys(selectedItems).length !== 1
-})
-const editar = () => {
-  emit('editar', Object.values(selectedItems)[0])
-}
-
-const excluirDesabilitado = computed(() => {
-  return Object.keys(selectedItems).length === 0
-})
-const excluir = () => {
-  emit('excluir', Object.values(selectedItems))
-}
-</script>
-
-<template>
-  <div>
-    <p-button
-      class="mr-2"
-      :disabled="editarDesabilitado"
-      @click="editar"
-    >
-      Editar
-    </p-button>
-
-    <p-button
-      variant="error"
-      :disabled="excluirDesabilitado"
-      @click="excluir"
-    >
-      Excluir
-    </p-button>
-
-    <table class="w-full mb-2">
-      <thead>
-        <tr class="border-b border-gray-400">
-          <th class="w-8 py-2">
-            <input type="checkbox"
-              :value="selectAll"
-              @input="toggleSelectAll"
-            />
-          </th>
-
-          <th v-for="header in processedHeaders" class="text-left font-medium">{{ header.title }}</th>
-        </tr>
-      </thead>
-
-      <tbody>
-        <tr v-for="(item, index) in items" class="border-b border-gray-300 text-gray-600">
-          <td class="text-center py-2">
-            <input type="checkbox"
-              :checked="!!selectedItems[index]"
-              :value="selectedItems[index]"
-              @input="(evt: Event) => updateSelected(index, evt)"
-            />
-          </td>
-
-          <td v-for="header in processedHeaders">{{ item[header.value] }}</td>
-        </tr>
-      </tbody>
-    </table>
-
-    <div class="flex justify-end gap-4">
-      <div class="flex gap-1">
-        <span>Itens por página</span>
-
-        <select class="border rounded-md py-1 px-3">
-          <option>5</option>
-          
-          <option>10</option>
-          
-          <option>15</option>
-        </select>
-      </div>
-
-      <div>
-        1-5 de 20
-      </div>
-
-      <div class="flex gap-2">
-        <p-button>|<</p-button>
-
-        <p-button class="border"><</p-button>
-
-        <p-button class="border">></p-button>
-
-        <p-button class="border">>|</p-button>
-      </div>
-    </div>
-  </div>
-</template>`;
+</script>`; 
 
 srcComponentsFiles[genericTextInput] = expandToString`
 <script setup lang="ts">
@@ -310,6 +133,16 @@ const emit = defineEmits<{
 const emitEnter = () => {
   emit('keyupEnter')
 }
+
+/**
+ * @description GenericTextInput Reusable Text Input Component This component represents a generic text input field with customizable type, placeholder, and variant for styling.
+ * 
+ * @component 
+ * @example <GenericTextInput v-model="inputValue" type="text" placeholder="Enter text" variant="default" @keyup-enter="handleEnter" />
+ * @prop {'text' | 'password'} type of the input field. 
+ * @prop {string} placeholder text for the input field.
+ * @prop {'error' | 'default'} variant for styling the input field.
+ */ 
 </script>
 
 
@@ -342,6 +175,15 @@ const className = computed(() => {
     return 'py-1 px-3 rounded-md text-white cursor-pointer disabled:cursor-default bg-red-800 disabled:bg-red-800/50'
   }
 })
+
+/**
+ * @description PButton Reusable Button Component This component represents a customizable button with different variants for styling.
+ * 
+ * @component 
+ * @example <PButton variant="default">Click Me</PButton>
+ * @prop {'default' | 'error'} variant for styling the input field.
+ */ 
+
 </script>
 
 <template>
@@ -351,42 +193,6 @@ const className = computed(() => {
     <slot />
   </button>
 </template>`;
-
-srcComponentsFiles[readMe] = expandToString`
-# Components
-
-Vue template files in this folder are automatically imported.
-
-## 🚀 Usage
-
-Importing is handled by [unplugin-vue-components](https://github.com/unplugin/unplugin-vue-components). This plugin automatically imports ".vue" files created in the "src/components" directory, and registers them as global components. This means that you can use any component in your application without having to manually import it.
-
-The following example assumes a component located at "src/components/MyComponent.vue":
-
-vue
-<template>
-  <div>
-    <MyComponent />
-  </div>
-</template>
-
-<script lang="ts" setup>
-  //
-</script>
-
-
-When your template is rendered, the component's import will automatically be inlined, which renders to this:
-
-vue
-<template>
-  <div>
-    <MyComponent />
-  </div>
-</template>
-
-<script lang="ts" setup>
-  import MyComponent from '@/components/MyComponent.vue'
-</script>`;
 
 srcComponentsFiles[textInput] = expandToString`
 <script lang="ts">
@@ -455,6 +261,17 @@ const emitEnter = () => {
 watch(isValid, (newValue) => {
   emit('validationUpdate', newValue)
 })
+
+/**
+ * @description GenerateNoGenericTextInput Text Input Component with Validation This component represents a text input field with built-in validation capabilities.
+ * 
+ * @component 
+ * @example <TextInput v-model="inputValue" :rules="[rule1, rule2]" type="text" placeholder="Enter text" @validationUpdate="handleValidation" @keyup-enter="handleEnter" />
+ * @prop {ValidationResultFunction[]} rules - Array of validation functions to validate the input value.
+ * @prop {'text' | 'password'} type of the input field. 
+ * @prop {string} placeholder text for the input field.
+ * 
+ */ 
 </script>
 
 <template>
