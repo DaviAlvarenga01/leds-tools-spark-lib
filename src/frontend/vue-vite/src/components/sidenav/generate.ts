@@ -18,6 +18,16 @@ function generateNavGroup(): string {
 import { ref } from 'vue'
 import IconNav from '../icons/IconNav.vue';
 
+/**
+ * @description NavGroup: Navigation Group Component This component represents a collapsible group of navigation items within a sidebar or navigation menu. 
+ * @description It displays a label and can expand or collapse to show or hide its child navigation items. 
+ * @description The open state is managed internally, allowing users to toggle the visibility of the contained items.
+ * @component 
+ * @example <NavGroup label="Group Label"> ... </NavGroup>
+ * @prop {string} label - The label for the navigation group.
+ */
+
+
 defineProps<{
   label: string
 }>()
@@ -53,6 +63,15 @@ function generateNavItem(): string {
 defineProps<{
   label: string
 }>()
+
+/**
+ * @description NavItem Link Component This component represents a single navigation item within a sidebar or navigation menu.
+ * 
+ * @component 
+ * @example <NavItem :to="{ name: 'route-name' }" label="Item Label" />
+ * @prop {string} label - The label for the navigation item.
+ */ 
+
 </script>
 
 <template>
@@ -79,6 +98,15 @@ function generateNavMenu(project_abstraction: SEON.ProjectAbstraction): string {
 <script lang="ts" setup>
 import NavGroup from './NavGroup.vue'
 import NavItem from './NavItem.vue'
+
+/**
+ * @description NavMenu: Navigation Menu Component This component represents the main navigation menu, it's the sidebar properly.
+ * 
+ * @component 
+ * @example <NavMenu />
+ */ 
+
+
 </script>
 
 <template>

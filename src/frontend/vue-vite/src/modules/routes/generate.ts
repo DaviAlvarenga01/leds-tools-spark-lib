@@ -81,5 +81,14 @@ export const routes: RouteRecordRaw[] = [
     component: Criar,
   }
 ]
+
+/**
+ * @description Generates the route configuration implementation
+ * @description Creates Vue Router route definitions for an entity's views
+ * @description generateRoute${cls.getName()}: Route configuration for ${cls.getName()}
+ * @param project_abstraction - Project metadata
+ * @param cls - Class for which to generate route config
+ * @returns {RouteRecordRaw[]} Vue Router configuration content
+ */
 `
 }

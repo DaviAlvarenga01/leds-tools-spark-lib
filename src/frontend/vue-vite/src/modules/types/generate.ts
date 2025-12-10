@@ -36,7 +36,7 @@ import SEON from "seon-lib-implementation";
  */
 export function generate(project_abstraction: SEON.ProjectAbstraction, cls: SEON.ClassAbstraction, target_folder: string) : void {
     fs.writeFileSync(path.join(target_folder, `${cls.getName().toLowerCase()}.d.ts`), generateType(project_abstraction, cls))
-}
+  }
 
 /**
  * Generates the type definitions implementation
@@ -66,11 +66,24 @@ export type ${cls.getName()} = {
 
 export type ${cls.getName()}CreateReq = Pick<${cls.getName()}, ${generateAttributesToPick(project_abstraction, cls)}>
 
+/**
+ * @description ${cls.getName()}CreateReq: Type for create operation
+ * @param {${cls.getName()}} - Base entity type
+ * @returns {Pick<${cls.getName()}, ${generateAttributesToPick(project_abstraction, cls)}>}
+ */  
 
 export type ${cls.getName()}ListRes = {
   "@odata.context": string
   value: ${cls.getName()}[]
 }
+
+/**
+ * @description ${cls.getName()}ListRes: OData response for list operation
+ * @param {string} @odata.context - OData context URL
+ * @param {${cls.getName()}[]} value - Array of ${cls.getName()} entities
+ * @param {number} statusCode - HTTP status code
+ * @returns {${cls.getName()}[]}
+ */  
 
 export type ${cls.getName()}CreateRes = {
   statusCode: number
@@ -78,15 +91,35 @@ export type ${cls.getName()}CreateRes = {
   message: string
 }
 
+/**
+ * @description ${cls.getName()}CreateRes: Response for create operation
+ * @param {number} statusCode - HTTP status code
+ * @param {string} uri - URI of the created entity
+ * @param {string} message - Success message
+ */  
+
 export type ${cls.getName()}GetRes = ${cls.getName()}ListRes
 
+/**
+ * @description ${cls.getName()}GetRes: Response for get operation
+ * @returns {${cls.getName()}[]} Array of ${cls.getName()} entities
+ */  
 
 export type ${cls.getName()}UpdateRes = {
   statusCode: number
   message: string
 }
+/**
+ * @description ${cls.getName()}UpdateRes: Response for update operation
+ * @param {number} statusCode - HTTP status code
+ * @param {string} message - Success message
+ */  
 
 export type ${cls.getName()}DeleteRes = ${cls.getName()}UpdateRes
+/**
+ * @description ${cls.getName()}DeleteRes: Response for delete operation
+ * @returns {number} statusCode - HTTP status code  
+ */  
 `
 }
 
@@ -112,6 +145,7 @@ function generateAttributes(project_abstraction: SEON.ProjectAbstraction, cls: S
 
     return str
 }
+
 
 function generateAttributesToPick(project_abstraction: SEON.ProjectAbstraction, cls: SEON.ClassAbstraction) : string {
     let str = ""

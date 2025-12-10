@@ -118,11 +118,11 @@ beforeAll(() => {
  * the test directory.
  * 
  * @function afterAll
- */
+ 
 afterAll(() => {
     deleteFolderRecursive(path.join(__dirname, 'frontend'));
 });
-
+*/
 
 
 /**

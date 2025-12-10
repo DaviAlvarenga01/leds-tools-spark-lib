@@ -90,6 +90,16 @@ const excluirDesabilitado = computed(() => {
 const excluir = () => {
   emit('excluir', Object.values(selectedItems))
 }
+
+/**
+ * @description GenerateDataTable Generic Data Table Component This component represents a reusable data table with selectable rows and action buttons for editing and deleting entries.
+ * 
+ * @component 
+ * @example <DataTable :items="dataItems" :headers="dataHeaders" @editar="handleEdit" @excluir="handleDelete" />
+ * @prop {DataTableItem[]} items - Array of data items to display in the table.
+ * @prop {DataTableHeader[]} [headers] - Optional array of header definitions for the table columns.
+ */ 
+
 </script>
 
 <template>
@@ -179,6 +189,16 @@ function generateCard() : string {
     <slot />
   </div>
 </template>
+
+<script setup lang="ts">
+/**
+ * @description GenerateCard Simple Card Component This component represents a simple card layout with padding, border, rounded corners, and shadow.
+ * 
+ * @component 
+ * @example <Card></Card>Card Content</Card>
+ */ 
+
+</script>
 `
 }
 
@@ -217,6 +237,16 @@ const emit = defineEmits<{
 const emitEnter = () => {
   emit('keyupEnter')
 }
+
+/**
+ * @description GenericTextInput Reusable Text Input Component This component represents a generic text input field with customizable type, placeholder, and variant for styling.
+ * 
+ * @component 
+ * @example <GenericTextInput v-model="inputValue" type="text" placeholder="Enter text" variant="default" @keyup-enter="handleEnter" />
+ * @prop {'text' | 'password'} type of the input field. 
+ * @prop {string} placeholder text for the input field.
+ * @prop {'error' | 'default'} variant for styling the input field.
+ */ 
 </script>
 
 
@@ -253,6 +283,15 @@ const className = computed(() => {
     return 'py-1 px-3 rounded-md text-white cursor-pointer disabled:cursor-default bg-red-800 disabled:bg-red-800/50'
   }
 })
+
+/**
+ * @description PButton Reusable Button Component This component represents a customizable button with different variants for styling.
+ * 
+ * @component 
+ * @example <PButton variant="default">Click Me</PButton>
+ * @prop {'default' | 'error'} variant for styling the input field.
+ */ 
+
 </script>
 
 <template>
@@ -334,6 +373,17 @@ const emitEnter = () => {
 watch(isValid, (newValue) => {
   emit('validationUpdate', newValue)
 })
+
+/**
+ * @description GenerateNoGenericTextInput Text Input Component with Validation This component represents a text input field with built-in validation capabilities.
+ * 
+ * @component 
+ * @example <TextInput v-model="inputValue" :rules="[rule1, rule2]" type="text" placeholder="Enter text" @validationUpdate="handleValidation" @keyup-enter="handleEnter" />
+ * @prop {ValidationResultFunction[]} rules - Array of validation functions to validate the input value.
+ * @prop {'text' | 'password'} type of the input field. 
+ * @prop {string} placeholder text for the input field.
+ * 
+ */ 
 </script>
 
 <template>

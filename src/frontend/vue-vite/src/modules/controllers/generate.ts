@@ -54,7 +54,9 @@ export function generate(project_abstraction: SEON.ProjectAbstraction, cls: SEON
  * 
  * Generated Functions:
  * - listar{Class}: List with error handling
+ * - {Promise<{Class}[]>} List of entities
  * - criar{Class}: Create with success notification
+ * - {Promise<boolean>} Success status
  * - obter{Class}: Get with error handling
  * - atualizar{Class}: Update with feedback
  * - excluir{Class}: Delete with confirmation
@@ -68,6 +70,7 @@ function generateController(project_abstraction: SEON.ProjectAbstraction, cls: S
 /**
  * arquivo controller trata da parte de erros e interface de usuario
  */
+
 import {
   criar${cls.getName()} as _criar${cls.getName()},
   listar${cls.getName()} as _listar${cls.getName()},
@@ -87,6 +90,11 @@ export const listar${cls.getName()} = async () => {
     throw error
   }
 }
+/**
+*  @description listar${cls.getName()}: List with error handling
+* @returns {Promise<{Class}[]>} List of entities
+* 
+*/
 
 export const criar${cls.getName()} = async (${cls.getName().toLowerCase()}: ${cls.getName()}CreateReq) => {
   const ui = useUiStore()
@@ -120,6 +128,12 @@ export const criar${cls.getName()} = async (${cls.getName().toLowerCase()}: ${cl
   }
 }
 
+/**
+ * @description criar${cls.getName()}: Create with success notification
+ * @returns {Promise<boolean>} Success status
+ **/
+
+
 export const obter${cls.getName()} = async (id: string) => {
   try {
     const data = await _obter${cls.getName()}(id)
@@ -128,6 +142,12 @@ export const obter${cls.getName()} = async (id: string) => {
     throw error
   }
 }
+
+/**
+ * @description obter${cls.getName()}: Get with error handling
+ * @returns {Promise<{Class}>} Retrieved entity
+ */
+
 
 export const atualizar${cls.getName()} = async (${cls.getName().toLowerCase()}: ${cls.getName()}) => {
   try {
@@ -138,6 +158,11 @@ export const atualizar${cls.getName()} = async (${cls.getName().toLowerCase()}: 
   }
 }
 
+/**
+ * @description atualizar${cls.getName()}: Update with feedback
+ * @returns {Promise<boolean>} Success status
+ */
+
 export const excluir${cls.getName()} = async (id: string) => {
   try {
     const { data } = await _excluir${cls.getName()}(id)
@@ -146,6 +171,11 @@ export const excluir${cls.getName()} = async (id: string) => {
     throw error
   }
 }
+
+/**
+ * @description excluir${cls.getName()}: Delete with confirmation
+ * @returns {Promise<boolean>} Success status
+ */
 
 export const excluir${cls.getName()}s = async (ids: string[]) => {
   try {
@@ -156,6 +186,24 @@ export const excluir${cls.getName()}s = async (ids: string[]) => {
   } catch (error) {
     throw error
   }
-}    
+}  
+    
+/**
+ * @description excluir${cls.getName()}: Delete with confirmation
+ * @returns {Promise<boolean>} Success status
+ */
+
 `
+
+}
+
+/** 
+ * @description Teste de documentação
+ * @param 
+ * 
+ * 
+ * 
+ * */    
+function teste (x: number): number {
+    return x * 2
 }
