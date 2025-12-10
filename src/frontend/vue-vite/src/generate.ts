@@ -1,3 +1,29 @@
+/**
+ * Vue Application Source Generator Module
+ * 
+ * This module orchestrates the generation of a complete Vue.js application
+ * structure, creating all necessary directories and files following a
+ * modular architecture pattern.
+ * 
+ * Application Structure:
+ * src/
+ * ├── api/          - API client and configurations
+ * ├── assets/       - Static assets and styles
+ * ├── components/   - Reusable Vue components
+ * │   ├── icons/    - Icon components
+ * │   └── sidenav/  - Navigation components
+ * ├── layouts/      - Page layout templates
+ * ├── modules/      - Feature modules (per entity)
+ * ├── plugins/      - Vue plugins and integrations
+ * ├── routes/       - Router configuration
+ * ├── stores/       - State management (Pinia)
+ * ├── types/        - TypeScript declarations
+ * ├── utils/        - Utility functions
+ * ├── views/        - Page components
+ * ├── App.vue       - Root component
+ * └── main.ts       - Application entry point
+ */
+
 import fs from "fs";
 import { createPath } from "../../../util/generator-utils.js";
 import { expandToString } from "../../../util/template-string.js";

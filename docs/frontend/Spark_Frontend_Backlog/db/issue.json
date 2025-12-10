@@ -1,0 +1,93 @@
+{
+  "data": [
+    {
+      "id": "psbacklog.entrega1",
+      "title": "Primeira Grande Entrega",
+      "description": "Conjunto de Features que compõem a primeira entrega da disciplina",
+      "type": "epic",
+      "issues": [
+        {
+          "id": "psbacklog.entrega1.feature1_1",
+          "title": "Correções no Frontend",
+          "description": "Lib gerando um frontend sem erros e que acesse as rotas expostas pelo backend",
+          "type": "atomicuserstory",
+          "issues": [
+            {
+              "id": "psbacklog.entrega1.feature1_1.frontend_fix",
+              "title": "Identificação e correção de erros no frontend gerado pelo spark",
+              "description": "Lib gerando um frontend sem erros e que acesse as rotas expostas pelo backend",
+              "type": "taskbacklog",
+              "depends": []
+            }
+          ],
+          "depends": []
+        },
+        {
+          "id": "psbacklog.entrega1.feature1_2",
+          "title": "Documentação do código gerado no frontend",
+          "description": "Lib gerando um código documentado para o frontend",
+          "type": "atomicuserstory",
+          "issues": [
+            {
+              "id": "psbacklog.entrega1.feature1_2.documetacao_frontend",
+              "title": "Documentação do frontend gerado",
+              "description": "Lib gerando a documentação do frontend junto com o código",
+              "type": "taskbacklog",
+              "depends": []
+            }
+          ],
+          "depends": []
+        },
+        {
+          "id": "psbacklog.entrega1.feature1_3",
+          "title": "Geração do GitHub Workflow pra o backend",
+          "description": "Lib gerando o GitHub Workflow no backend (e o CI do GitLab)",
+          "type": "atomicuserstory",
+          "issues": [
+            {
+              "id": "psbacklog.entrega1.feature1_3.entrega0",
+              "title": "Geração do GitHub Workflow pra o backend",
+              "description": "Lib gerando o GitHub Workflow no backend (e o CI do GitLab)",
+              "type": "taskbacklog",
+              "depends": []
+            }
+          ],
+          "depends": []
+        }
+      ],
+      "depends": []
+    },
+    {
+      "id": "psbacklog.entrega2",
+      "title": "Segunda Grande Entrega",
+      "description": "Conjunto de Features que compõem a segunda entrega da disciplina",
+      "type": "epic",
+      "issues": [
+        {
+          "id": "psbacklog.entrega2.feature2_1",
+          "title": "Module Doc Lib",
+          "description": "Criação de uma Lib modular de componentes reutilizáveis da Spark-Lib e da Andes-Lib",
+          "type": "atomicuserstory",
+          "issues": [
+            {
+              "id": "psbacklog.entrega2.feature2_1.compreencao_lib",
+              "title": "Compreensão dos componentes que estarão na nova lib",
+              "description": "Listagem dos componentes que estarão na nova lib",
+              "type": "taskbacklog",
+              "depends": []
+            },
+            {
+              "id": "psbacklog.entrega2.feature2_1.criacao_lib",
+              "title": "Criação da nova lib com os componentes reutilizáveis",
+              "description": "Criação de uma Lib modular com os componentes reutilizáveis da Spark-Lib e da Andes-Lib",
+              "type": "taskbacklog",
+              "depends": []
+            }
+          ],
+          "depends": []
+        }
+      ],
+      "depends": []
+    }
+  ]
+}

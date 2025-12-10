@@ -1,0 +1,117 @@
+project sparkFE {
+  name: "Spark Lib Frontend"
+  description: "PS/GPS Backlog para as alterações no Frontend gerado pelo Spark"
+  startDate: 2025-09-15
+  dueDate: 2025-11-28
+  completedDate: 2025-11-28
+}
+
+team TeamID1 {
+  name: "Time de Gestão"
+  description: "os integrantes do time de gestão são os alunos da disciplina de Gestão de Projetos de Software"
+
+  // teammember memberid1 {
+  //   name: "Renzo" 
+  // }
+  // teammember memberid2{
+  //   name:"Henrique"
+  // }
+  // teammember memberid3{
+  //   name:"Bruno Chevitarese"
+  // }
+  // teammember memberid4{
+  //   name:"Lucas Bruno"
+  // }
+  teammember memberid5{
+    name: "Nicolas-Botelho"
+    email: "nicolasbotelho2005@gmail.com"
+  }
+  teammember memberid6{
+    name:"guilhermbc"
+    name: "guilhermeborgescabral@gmail.com"
+  }
+}
+
+// team TeamID2 {
+//   name: "Time de Desenvolvimento"
+//   description: "os integrantes do time de gestão são os alunos da disciplina de Projeto de Software"
+    
+//   teammember memberid1 {
+//     name: "Piani" 
+//   }
+//   teammember memberid2{
+//     name:"Davi Alvarenga"
+//   }
+//   teammember memberid2{
+//     name:"Matheus Garicas"
+//   }
+// }
+
+
+backlog psBacklog {
+  name: "Spark Frontend Backlog"
+  description: "Entregas e Features para a Spark Frontend PS Team"
+
+  epic entrega1 {
+    name: "Primeira Grande Entrega"
+    description: "Conjunto de Features que compõem a primeira entrega da disciplina"
+    Criterions: "Frontend funcionando sem erros, conectado com o backend", "Documentação da arquitetura do Frontend"
+    observation: "Data de Entrega: 02/11"
+
+    story feature1_1 {
+      name: "Correções no Frontend"
+      description: "Lib gerando um frontend sem erros e que acesse as rotas expostas pelo backend"
+      Requirements: "Lib gerando um frontend sem erros e que acesse as rotas expostas pelo backend"
+      Criterions: "Frontend funcionando sem erros", "Frontend consumindo a rota exposta pelo Backend"
+      task frontend_fix {
+        name: "Identificação e correção de erros no frontend gerado pelo spark"
+        description: "Lib gerando um frontend sem erros e que acesse as rotas expostas pelo backend"
+        Deliverables: "Lib gerando um frontend sem erros", "Lib gerando um frontend que consuma a rota exposta pelo backend"
+      }
+    }
+    story feature1_2 {
+      name: "Documentação do código gerado no frontend"
+      description: "Lib gerando um código documentado para o frontend"
+      Requirements: "Lib gerando um código documentado para o frontend"
+      Criterions: "Frontend gerado com documentação"
+      task documetacao_frontend {
+        name: "Documentação do frontend gerado"
+        description: "Lib gerando a documentação do frontend junto com o código"
+        Deliverables: "Lib gerando a documentação do frontend junto com o código"
+      }
+    }
+    story feature1_3 {
+      name: "Geração do GitHub Workflow pra o backend"
+      description: "Lib gerando o GitHub Workflow no backend (e o CI do GitLab)"
+      Requirements: "Lib gerando o GitHub Workflow no backend (e o CI do GitLab)"
+      Criterions: "Lib gerando o GitHub Workflow no backend (e o CI do GitLab)"
+      task entrega0 {
+        name: "Geração do GitHub Workflow pra o backend"
+        description: "Lib gerando o GitHub Workflow no backend (e o CI do GitLab)"
+        Deliverables: "Lib gerando o GitHub Workflow no backend (e o CI do GitLab)"
+      }
+    }
+  }
+  epic entrega2 {
+    name: "Segunda Grande Entrega"
+    description: "Conjunto de Features que compõem a segunda entrega da disciplina"
+    Criterions: "Module Doc Lib"
+    observation: "Data de Entrega: 30/11"
+    story feature2_1 {
+      name: "Module Doc Lib"
+      description: "Criação de uma Lib modular de componentes reutilizáveis da Spark-Lib e da Andes-Lib"
+      Requirements: "Criação de uma Lib modular de componentes reutilizáveis da Spark-Lib e da Andes-Lib"
+      Criterions: "Criação de uma Lib modular de componentes reutilizáveis da Spark-Lib e da Andes-Lib"
+      task compreencao_lib {
+        name: "Compreensão dos componentes que estarão na nova lib"
+        description: "Listagem dos componentes que estarão na nova lib"
+        Deliverables: "Listagem dos componentes que estarão na nova lib"
+      }
+      task criacao_lib {
+        name: "Criação da nova lib com os componentes reutilizáveis"
+        description: "Criação de uma Lib modular com os componentes reutilizáveis da Spark-Lib e da Andes-Lib"
+        Deliverables: "Lib modular de componentes reutilizáveis da Spark-Lib e da Andes-Lib"
+      }
+    }
+  }
+}

@@ -1,3 +1,19 @@
+/**
+ * Modules Generator Module
+ * 
+ * This module generates feature modules based on the project's entities.
+ * Each module is a self-contained feature with its own API integration,
+ * views, routes, and type definitions.
+ * 
+ * Module Structure:
+ * module/
+ * ├── api/          - API integration
+ * ├── controllers/  - Business logic
+ * ├── routes/       - Module routing
+ * ├── types/        - Type definitions
+ * └── views/        - Module-specific views
+ */
+
 import { createPath } from "../../../../util/generator-utils.js";
 import { generate as generateAPI} from "./api/generate.js"
 import { generate as generateControllers} from "./controllers/generate.js"
@@ -9,6 +25,21 @@ import { expandToString } from "../../../../util/template-string.js";
 import path from "path"
 import SEON from "seon-lib-implementation";
 
+/**
+ * Main modules generator function
+ * 
+ * Creates module directories and files for each entity in the project.
+ * 
+ * @param project_abstraction - Project structure with entity definitions
+ * @param target_folder - Base directory for module generation
+ * 
+ * Generated per Module:
+ * - API integration layer
+ * - Business logic controllers
+ * - Route definitions
+ * - Type declarations
+ * - CRUD views
+ */
 export function generate(project_abstraction: SEON.ProjectAbstraction, target_folder: string) : void {
     const classList : SEON.ClassAbstraction[] = []
 
@@ -27,6 +58,20 @@ export function generate(project_abstraction: SEON.ProjectAbstraction, target_fo
     }
 }
 
+/**
+ * Generates the main module index file
+ * 
+ * Creates an index.ts that exports all module routes and serves as the
+ * entry point for module functionality.
+ * 
+ * @param clsList - List of entity classes to generate modules for
+ * @returns Module index file content
+ * 
+ * Features:
+ * - Route aggregation
+ * - Type-safe exports
+ * - Dynamic module loading
+ */
 function generateModulesIndex(clsList : SEON.ClassAbstraction[]) : string {
     return expandToString`
 import { type RouteRecordRaw } from 'vue-router'
@@ -39,6 +84,20 @@ ${generateExportClass(clsList)}
 `
 }
 
+/**
+ * Generates import statements for module routes
+ * 
+ * Creates import statements for each entity module's routes.
+ * 
+ * @param clsList - List of entity classes to import routes from
+ * @returns Import statements string
+ * 
+ * Example output:
+ * ```typescript
+ * import { routes as userRoute } from './User'
+ * import { routes as productRoute } from './Product'
+ * ```
+ */
 function generateImportClass(clsList: SEON.ClassAbstraction[]) : string {
     let str = ""
 

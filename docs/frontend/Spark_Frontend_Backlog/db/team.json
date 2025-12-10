@@ -1,0 +1,21 @@
+{
+  "data": [
+    {
+      "id": "TeamID1",
+      "name": "Time de Gestão",
+      "description": "os integrantes do time de gestão são os alunos da disciplina de Gestão de Projetos de Software",
+      "teamMembers": [
+        {
+          "id": "memberid5",
+          "name": "Nicolas-Botelho",
+          "email": "nicolasbotelho2005@gmail.com"
+        },
+        {
+          "id": "memberid6",
+          "name": "guilhermeborgescabral@gmail.com",
+          "email": ""
+        }
+      ]
+    }
+  ]
+}

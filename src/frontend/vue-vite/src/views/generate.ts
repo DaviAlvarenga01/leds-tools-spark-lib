@@ -1,8 +1,33 @@
+/**
+ * Views Generator Module
+ * 
+ * This module is responsible for generating Vue view components that represent
+ * different pages and screens in the application. It creates views with proper
+ * routing integration, state management, and UI interactions.
+ * 
+ * Generated Views:
+ * - Login: Authentication view with form validation
+ * - Entity views (generated per module)
+ */
+
 import fs from "fs"
 import { expandToString } from "../../../../util/template-string.js";
 import path from "path"
 import SEON from "seon-lib-implementation";
 
+/**
+ * Main views generator function
+ * 
+ * @param project_abstraction - Project metadata and structure information
+ * @param target_folder - Directory where view components will be generated
+ * 
+ * Generated Features:
+ * - Form validation
+ * - State management integration
+ * - Modal system integration
+ * - Route handling
+ * - Authentication flows
+ */
 export function generate(project_abstraction: SEON.ProjectAbstraction, target_folder: string) : void {
     fs.writeFileSync(path.join(target_folder, 'Login.vue'), generateLogin(project_abstraction, target_folder))
 }

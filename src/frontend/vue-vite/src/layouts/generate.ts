@@ -1,8 +1,40 @@
+/**
+ * Layouts Generator Module
+ * 
+ * This module generates Vue layout components that define the overall structure
+ * and common UI elements of the application. Layouts serve as containers that
+ * wrap route components and provide consistent navigation, header/footer elements,
+ * and other shared UI features.
+ * 
+ * Generated Layouts:
+ * - Default.vue: Main application layout with navigation bar and sidebar
+ * - NewDefault.vue: Alternative default layout with modern styling
+ * - NewPlain.vue: Modern minimal layout without navigation elements
+ * - Plain.vue: Basic layout without navigation or complex UI elements
+ */
+
 import fs from "fs"
 import { expandToString } from "../../../../util/template-string.js";
 import path from "path"
 import SEON from "seon-lib-implementation";
 
+/**
+ * Main layout generator function
+ * 
+ * Creates all layout components for the Vue application.
+ * Each layout provides different structural templates for
+ * various page types and use cases.
+ * 
+ * @param project_abstraction - Project metadata for customizing layouts
+ * @param target_folder - Directory where layout files will be generated
+ * 
+ * Layout Components:
+ * layouts/
+ * ├── Default.vue    - Full featured layout with navigation
+ * ├── NewDefault.vue - Modern styled default layout
+ * ├── NewPlain.vue   - Modern minimal layout
+ * └── Plain.vue      - Basic layout template
+ */
 export function generate(project_abstraction: SEON.ProjectAbstraction, target_folder: string) : void {
     fs.writeFileSync(path.join(target_folder, 'Default.vue'), generateDefault(project_abstraction, target_folder))
     fs.writeFileSync(path.join(target_folder, 'NewDefault.vue'), generateNewDefault(project_abstraction, target_folder))
@@ -10,6 +42,23 @@ export function generate(project_abstraction: SEON.ProjectAbstraction, target_fo
     fs.writeFileSync(path.join(target_folder, 'Plain.vue'), generatePlain(project_abstraction, target_folder))
 }
 
+/**
+ * Generates the Default layout component
+ * 
+ * Creates the main application layout that includes a navigation bar,
+ * sidebar toggle, and authentication integration. This layout serves
+ * as the primary container for most application pages.
+ * 
+ * Features:
+ * - Responsive navigation bar with collapsible sidebar
+ * - Authentication status and logout functionality
+ * - UI state management integration
+ * - Alert/snackbar message system
+ * 
+ * @param project_abstraction - Project metadata for layout customization
+ * @param target_folder - Directory where the layout will be saved
+ * @returns {string} Vue component template for Default layout
+ */
 function generateDefault(project_abstraction: SEON.ProjectAbstraction, target_folder: string) : string {
     return expandToString`
 <script setup lang="ts">
@@ -77,6 +126,16 @@ ${generateClassDivider(project_abstraction, target_folder)}
 `
 }
 
+/**
+ * Generates navigation items for each class in the project
+ * 
+ * Creates a list of navigation items in the sidebar for each class
+ * defined in the project, with links to list and create views.
+ * 
+ * @param project_abstraction - Project metadata containing class definitions
+ * @param target_folder - Directory where the layout will be saved
+ * @returns {string} Vue template for class-based navigation items
+ */
 function generateClassDivider(project_abstraction: SEON.ProjectAbstraction, target_folder: string) : string {
     let str: string = ""
     const classList : SEON.ClassAbstraction[] = []
@@ -112,6 +171,23 @@ function generateClassDivider(project_abstraction: SEON.ProjectAbstraction, targ
     return str
 }
 
+/**
+ * Generates the NewDefault layout component
+ * 
+ * Creates a modern styled layout with a simplified navigation structure
+ * and Tailwind CSS-based styling. This layout provides a fresh, clean
+ * look while maintaining core functionality.
+ * 
+ * Features:
+ * - Tailwind CSS utility classes for styling
+ * - Fixed sidebar with navigation menu
+ * - Authentication integration with logout
+ * - Full-width main content area
+ * 
+ * @param project_abstraction - Project metadata for layout customization
+ * @param target_folder - Directory where the layout will be saved
+ * @returns {string} Vue component template for NewDefault layout
+ */
 function generateNewDefault(project_abstraction: SEON.ProjectAbstraction, target_folder: string) : string {
     return expandToString`
 <script setup lang="ts">
@@ -137,6 +213,22 @@ const sair = async () => {
 `
 }
 
+/**
+ * Generates the NewPlain layout component
+ * 
+ * Creates a minimal layout without navigation elements, suitable for
+ * full-screen or centered content pages like login screens or landing pages.
+ * Uses modern Tailwind CSS utilities for centering and sizing.
+ * 
+ * Features:
+ * - Full screen wrapper with centered content
+ * - No navigation or additional UI elements
+ * - Clean, distraction-free layout
+ * 
+ * @param project_abstraction - Project metadata for layout customization
+ * @param target_folder - Directory where the layout will be saved
+ * @returns {string} Vue component template for NewPlain layout
+ */
 function generateNewPlain(project_abstraction: SEON.ProjectAbstraction, target_folder: string) : string {
     return expandToString`
 <template>
@@ -147,6 +239,23 @@ function generateNewPlain(project_abstraction: SEON.ProjectAbstraction, target_f
 `
 }
 
+/**
+ * Generates the Plain layout component
+ * 
+ * Creates a basic layout that includes a modal system using Vue's
+ * provide/inject pattern. This layout is ideal for simple pages
+ * that need modal functionality without navigation elements.
+ * 
+ * Features:
+ * - Modal system with text support
+ * - Readonly state management
+ * - Clean API for modal operations
+ * - Dependency injection setup
+ * 
+ * @param project_abstraction - Project metadata for layout customization
+ * @param target_folder - Directory where the layout will be saved
+ * @returns {string} Vue component template for Plain layout
+ */
 function generatePlain(project_abstraction: SEON.ProjectAbstraction, target_folder: string) : string {
     return expandToString`
 <script setup lang="ts">
